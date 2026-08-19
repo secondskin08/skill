@@ -1,0 +1,8 @@
+interface:
+  display_name: "科技编辑视觉系统"
+  short_description: "从封面风格延伸到一致的正文排版、配图与长图系列"
+  brand_color: "#5D25D9"
+  default_prompt: "Use $tech-editorial-design 使用中文风格名制作封面，并延伸出同风格的正文排版、正文配图和结尾页。"
+
+policy:
+  allow_implicit_invocation: true
