@@ -707,21 +707,45 @@ RENDERERS = {
 def find_browser() -> Optional[str]:
     candidates = [
         shutil.which(name)
-        for name in ("msedge", "msedge.exe", "chrome", "chrome.exe", "chromium", "chromium.exe")
+        for name in (
+            "msedge",
+            "msedge.exe",
+            "microsoft-edge",
+            "microsoft-edge-stable",
+            "chrome",
+            "chrome.exe",
+            "google-chrome",
+            "google-chrome-stable",
+            "chromium",
+            "chromium.exe",
+            "chromium-browser",
+        )
     ]
-    local_app_data = Path(os.environ.get("LOCALAPPDATA", ""))
-    program_files = Path(os.environ.get("PROGRAMFILES", r"C:\Program Files"))
-    program_files_x86 = Path(os.environ.get("PROGRAMFILES(X86)", r"C:\Program Files (x86)"))
-    candidates.extend(
-        [
-            str(local_app_data / "Microsoft/Edge/Application/msedge.exe"),
-            str(local_app_data / "Google/Chrome/Application/chrome.exe"),
-            str(program_files / "Microsoft/Edge/Application/msedge.exe"),
-            str(program_files / "Google/Chrome/Application/chrome.exe"),
-            str(program_files_x86 / "Microsoft/Edge/Application/msedge.exe"),
-            str(program_files_x86 / "Google/Chrome/Application/chrome.exe"),
-        ]
-    )
+    if sys.platform == "darwin":
+        candidates.extend(
+            [
+                "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+                "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+                "/Applications/Chromium.app/Contents/MacOS/Chromium",
+                str(Path.home() / "Applications/Google Chrome.app/Contents/MacOS/Google Chrome"),
+                str(Path.home() / "Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"),
+                str(Path.home() / "Applications/Chromium.app/Contents/MacOS/Chromium"),
+            ]
+        )
+    elif os.name == "nt":
+        local_app_data = Path(os.environ.get("LOCALAPPDATA", ""))
+        program_files = Path(os.environ.get("PROGRAMFILES", r"C:\Program Files"))
+        program_files_x86 = Path(os.environ.get("PROGRAMFILES(X86)", r"C:\Program Files (x86)"))
+        candidates.extend(
+            [
+                str(local_app_data / "Microsoft/Edge/Application/msedge.exe"),
+                str(local_app_data / "Google/Chrome/Application/chrome.exe"),
+                str(program_files / "Microsoft/Edge/Application/msedge.exe"),
+                str(program_files / "Google/Chrome/Application/chrome.exe"),
+                str(program_files_x86 / "Microsoft/Edge/Application/msedge.exe"),
+                str(program_files_x86 / "Google/Chrome/Application/chrome.exe"),
+            ]
+        )
     for candidate in candidates:
         if candidate and Path(candidate).exists():
             return str(Path(candidate))
@@ -731,7 +755,7 @@ def find_browser() -> Optional[str]:
 def export_png(svg_path: Path, png_path: Path, width: int, height: int) -> Tuple[bool, str]:
     browser = find_browser()
     if not browser:
-        return False, "未检测到 Microsoft Edge 或 Google Chrome headless，已保留 SVG；请安装浏览器后重试 PNG 导出。"
+        return False, "未检测到 Edge、Chrome 或 Chromium headless，已保留 SVG；请安装浏览器后重试 PNG 导出。"
     png_path.parent.mkdir(parents=True, exist_ok=True)
     uri = svg_path.resolve().as_uri()
     command = [

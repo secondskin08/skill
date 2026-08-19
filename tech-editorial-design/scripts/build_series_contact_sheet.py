@@ -27,6 +27,13 @@ def _font(size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
         Path("C:/Windows/Fonts/msyh.ttc"),
         Path("C:/Windows/Fonts/simhei.ttf"),
         Path("C:/Windows/Fonts/arial.ttf"),
+        Path("/System/Library/Fonts/PingFang.ttc"),
+        Path("/System/Library/Fonts/STHeiti Medium.ttc"),
+        Path.home() / "Library/Fonts/NotoSansCJK-Regular.ttc",
+        Path("/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"),
+        Path("/usr/share/fonts/opentype/noto/NotoSansCJKsc-Regular.otf"),
+        Path("/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc"),
+        Path.home() / ".local/share/fonts/NotoSansCJK-Regular.ttc",
     )
     for candidate in candidates:
         if candidate.exists():
