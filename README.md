@@ -25,15 +25,64 @@
 
 ## 安装
 
-把仓库克隆到本地，然后将 `tech-editorial-design` 文件夹复制到 Codex 的 Skills 目录。
+把仓库克隆到本地，然后将 `tech-editorial-design` 文件夹复制到 Codex 的 Skills 目录。Windows、macOS 和 Linux 都可以安装。
 
-Windows PowerShell 示例：
+### Windows PowerShell
+
+首次安装：
 
 ```powershell
 git clone https://github.com/wdy199210-blip/skill.git "$HOME\skill-library"
 New-Item -ItemType Directory -Path "$HOME\.codex\skills" -Force | Out-Null
 Copy-Item "$HOME\skill-library\tech-editorial-design" "$HOME\.codex\skills" -Recurse -Force
 ```
+
+如果已经克隆过仓库，先更新再复制：
+
+```powershell
+git -C "$HOME\skill-library" pull --ff-only
+Copy-Item "$HOME\skill-library\tech-editorial-design" "$HOME\.codex\skills" -Recurse -Force
+```
+
+安装后的入口文件应位于：
+
+```text
+C:\Users\你的用户名\.codex\skills\tech-editorial-design\SKILL.md
+```
+
+### macOS / Linux 终端
+
+在 macOS 的“终端”或 Linux 的 Shell 中运行：
+
+首次安装：
+
+```bash
+git clone https://github.com/wdy199210-blip/skill.git "$HOME/skill-library"
+mkdir -p "$HOME/.codex/skills"
+cp -R "$HOME/skill-library/tech-editorial-design" "$HOME/.codex/skills/"
+```
+
+如果已经克隆过仓库，先更新再复制：
+
+```bash
+git -C "$HOME/skill-library" pull --ff-only
+cp -R "$HOME/skill-library/tech-editorial-design" "$HOME/.codex/skills/"
+```
+
+安装后的入口文件应位于：
+
+```text
+~/.codex/skills/tech-editorial-design/SKILL.md
+```
+
+### 所有系统：手动安装
+
+如果不想使用 Git，可以在 GitHub 点击 `Code → Download ZIP`，解压后只复制完整的 `tech-editorial-design` 文件夹：
+
+- Windows：复制到 `%USERPROFILE%\.codex\skills\`；
+- macOS / Linux：复制到 `~/.codex/skills/`。
+
+不要只复制 `SKILL.md`，`agents`、`references` 和 `scripts` 文件夹也必须一起保留。
 
 重新打开 Codex 后，可以直接点名 `$tech-editorial-design`，也可以使用中文名称“科技编辑视觉系统”。
 
@@ -63,8 +112,9 @@ Copy-Item "$HOME\skill-library\tech-editorial-design" "$HOME\.codex\skills" -Rec
 ## 本地脚本依赖
 
 - Python 3；
-- 导出 PNG 时需要本机安装 Edge 或 Chrome；
-- 生成多图总览时需要 Pillow：`pip install -r tech-editorial-design/requirements.txt`。
+- 导出 PNG 时需要本机安装 Edge、Chrome 或 Chromium；脚本会查找 Windows、macOS 和 Linux 的常见安装位置；Safari 和 Firefox 暂不用于 PNG 导出，没有检测到支持的浏览器时仍会保留 SVG；
+- 生成多图总览时需要 Pillow：`python -m pip install -r tech-editorial-design/requirements.txt`；
+- macOS 默认优先使用苹方字体；Linux 建议安装 Noto Sans CJK 或文泉驿正黑，避免总览图中的中文变成方框。
 
 Skill 的正式入口是 [SKILL.md](tech-editorial-design/SKILL.md)。脚本默认保护已有文件；除非明确需要覆盖，否则请使用新的输出目录。
 
@@ -72,4 +122,4 @@ Skill 的正式入口是 [SKILL.md](tech-editorial-design/SKILL.md)。脚本默�
 
 该 Skill 用参考图提取视觉指纹，不承诺像素级复制，也不应复制受保护的 Logo、插画、完整版式或特定创作者的独特签名风格。引用图片作为主体素材前，请确认自己拥有使用权限。
 
-本仓库当前未附开源许可证。仓库内容可以公开查看；如需明确允许第三方修改、再分发或商业使用，仓库所有者应后续选择并添加合适的许可证。
+本项目使用 [MIT License](LICENSE)，版权人为 `dy w`。在保留版权与许可声明的前提下，可以使用、修改、分发和商业使用；软件按“现状”提供，不附带担保。
