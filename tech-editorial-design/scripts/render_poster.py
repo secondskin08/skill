@@ -124,9 +124,12 @@ def wrap_text(value: object, max_units: float = 16.0, max_lines: int = 3) -> Lis
 
 
 def _clip_line(line: str, max_units: float, ellipsis: bool = False) -> str:
-    if sum(_char_width(ch) for ch in line) <= max_units:
+    line_units = sum(_char_width(ch) for ch in line)
+    if not ellipsis and line_units <= max_units:
         return line
     suffix = "…" if ellipsis else ""
+    if ellipsis and line_units + _char_width(suffix) <= max_units:
+        return line + suffix
     available = max(0.0, max_units - _char_width(suffix))
     out: List[str] = []
     used = 0.0

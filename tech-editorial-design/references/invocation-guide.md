@@ -54,9 +54,19 @@ $tech-editorial-design，请使用 ref-[编号] [中文名]/[英文别名]。
 
 ## 2.1 画布比例与平台边界
 
-内置的封面、章节、正文、正文配图和结尾页统一按 3:4 竖版画布设计，默认是 1080×1440。需要更高或更低的清晰度时，`--width` 和 `--height` 只能同时按 3:4 等比例调整，例如 900×1200；其他比例会被拒绝，不会自动重排，也不会用拉伸或留白伪装适配。
+先选 `ref-01` 至 `ref-21`，再选目标平台 profile。profile 是“画布＋专用构图＋安全区”的名字，不是另一个视觉方向：同一个 ref 在不同 profile 中必须继续使用同一套背景、色板、字体层级、纹理、线条、圆角和 motif。
 
-公众号横图、抖音 9:16 画面以及其他比例，必须另选或制作专用版式。不要直接把其他比例传给这个内置渲染器，期待它自动变成横图或 9:16；如果要跨平台延伸，应先确定目标平台的专用版式，再沿用选定 preset 的设计令牌。
+| profile 名称 | 尺寸 | 用来做什么 | 页面支持 |
+|---|---:|---|---|
+| `xhs-portrait` | 1080×1440，3:4 | 小红书图文、公众号正文页和正文配图 | 8 页 |
+| `douyin-vertical` | 1080×1920，9:16 | 抖音封面、短视频章节帧、数据帧、结尾帧 | 8 页 |
+| `wechat-header` | 900×383 | 公众号文章头图 | 仅 `cover` |
+| `social-square` | 1080×1080，1:1 | 公众号分享卡、社交卡片、方形栏目封面 | 8 页 |
+| `landscape-video` | 1920×1080，16:9 | 横版视频、演示封面、宽屏内容 | 8 页 |
+
+`wechat-header` 只有封面是故意的：文章头图不应承载正文信息。公众号建议使用“`wechat-header` 头图 → `xhs-portrait` 正文和正文配图 → `social-square` 分享卡”的组合；不要把正文硬塞进公众号头图。抖音使用 `douyin-vertical`，横版视频使用 `landscape-video`。
+
+profile 之间只改变构图和安全区，不允许通过拉伸、黑边、上下留白或硬裁切伪装适配。`series.json` 会记录 `profile`、`canvas`、`ratio`、`safe_area`、`reserved_zones`、`tokens` 和 `stretched_from_3_4: false`，可用它检查是否真的使用了专用版式。完整安全区与平台路由见 [platform-canvas-profiles.md](platform-canvas-profiles.md)。
 
 ## 3. 再选页面类型
 
@@ -181,7 +191,7 @@ $tech-editorial-design，我要做一个 5 页竖版图文系列，请从头到�
 
 注意“锁定”包括：
 
-- 3:4 画布比例和安全边距；如果要换像素尺寸，只能保持 3:4 等比例；
+- 选定 profile 的画布比例和安全边距；跨平台时切换到专用 profile，不用拉伸或裁切假装适配；
 - 背景明暗与材质；
 - 主色、强调色和文字颜色；
 - 标题的位置、字重和行距；
@@ -227,7 +237,41 @@ $tech-editorial-design，请使用 ref-06 工业设备橱窗/industrial-showcase
 P-20260819-001 退回二创：保留 ref-15 三步指南，背景和紫色边框可以保留；但标题需要上移，步骤卡改成两大一小，正文区增加 15% 留白，禁止出现黑底和蓝色渐变。
 ```
 
-## 9. 可选的本地技术命令
+## 9. 多平台命令（可直接复制）
+
+以下命令以 `ref-20 / 奶油规则页 / cream-rulebook` 为例。把 `ref-20` 和文案换成实际方向；输出目录最好使用新的版本号，避免覆盖旧稿。
+
+```powershell
+cd "$HOME\.codex\skills\tech-editorial-design"
+$out = Join-Path $PWD "platform-v05"
+python scripts\render_platform_series.py --preset ref-20 --profile xhs-portrait --all-pages --title "我的主题" --subtitle "同一套设计语言" --footer "我的栏目" --output-dir $out --png
+python scripts\render_platform_series.py --preset ref-20 --profile douyin-vertical --all-pages --title "我的主题" --subtitle "同一套设计语言" --footer "我的栏目" --output-dir $out --png
+python scripts\render_platform_series.py --preset ref-20 --profile wechat-header --page-type cover --title "我的主题" --subtitle "文章摘要" --footer "我的栏目" --output-dir $out --png
+python scripts\render_platform_series.py --preset ref-20 --profile social-square --page-type cover --title "我的主题" --subtitle "转发卡片" --footer "我的栏目" --output-dir $out --png
+python scripts\render_platform_series.py --preset ref-20 --profile landscape-video --all-pages --title "我的主题" --subtitle "同一套设计语言" --footer "我的栏目" --output-dir $out --png
+```
+
+一次生成一个方向的五种画布，可以把上面五条替换为：
+
+```powershell
+python scripts\render_platform_series.py --preset ref-20 --all-profiles --all-pages --title "我的主题" --subtitle "同一套设计语言" --footer "我的栏目" --output-dir $out --png
+```
+
+这里的 `--all-pages` 会按 profile 的能力生成：`wechat-header` 只生成 `01-cover`，其余四个 profile 各生成 8 页。若只想生成 21 个方向的同一页，使用 `--all-presets --page-type cover`；若使用 `--all-presets --page-type body`，不要同时选 `--all-profiles`，因为 `wechat-header` 没有 body 页面。
+
+五种画布审核总览：
+
+```powershell
+python scripts\build_platform_contact_sheet.py --input-root $out --preset ref-20 --page 01-cover.png --output (Join-Path $out "ref-20-five-profiles.png")
+```
+
+查看某一个平台的 21 个方向，确认没有再次缩成几个黑底/蓝底模板：
+
+```powershell
+python scripts\build_platform_contact_sheet.py --input-root $out --profile xhs-portrait --page 01-cover.png --output (Join-Path $out "xhs-21-directions.png")
+```
+
+## 10. 可选的本地技术命令
 
 如果主代理已经确认 21 方向覆盖，可在本地生成带编号的覆盖目录；这一步只是预览，不代表最终模板：
 

@@ -2,11 +2,13 @@
 
 ## A. 结构与可编辑性
 
-- [ ] 输出为单个 SVG，`viewBox` 存在，默认尺寸为 1080×1440（3:4）；如使用自定义宽高，必须仍为 3:4 等比例，且保持可读层级；非 3:4 尺寸应在写出文件前被拒绝。
-- [ ] 没有用拉伸、上下/左右留白或裁切来伪装其他比例；公众号横图、抖音 9:16 等目标已改用对应专用版式。
+- [ ] 输出为单个 SVG，`viewBox` 存在，并且与所选 profile 完全一致：`xhs-portrait` 1080×1440、`douyin-vertical` 1080×1920、`wechat-header` 900×383、`social-square` 1080×1080、`landscape-video` 1920×1080。
+- [ ] 跨平台输出使用 `render_platform_series.py` 的专用 profile；没有用拉伸、上下/左右留白或裁切来伪装其他比例。旧的 3:4 系列脚本仍只接受 3:4 等比例尺寸。
+- [ ] `wechat-header` 只输出 `cover`；公众号正文和正文配图使用 `xhs-portrait`，分享卡使用 `social-square`，没有把正文硬塞进头图。
+- [ ] `series.json` 中存在正确的 `profile`、`canvas`、`ratio`、`safe_area`、`reserved_zones`、`dedicated_layout: true` 和 `stretched_from_3_4: false`。
 - [ ] 输出路径不存在，或用户明确要求覆盖并显式使用了 `--force`；旧稿和审核稿没有被静默替换。
 - [ ] 标题、副标题、眉题、页脚、数字和标签是 `<text>` / `<tspan>`，不是烘焙进图片的位图。
-- [ ] 显式 `\n` 被保留；自动换行不超过 3 行；标题与主体不互相遮挡。
+- [ ] 显式 `\n` 被保留；自动换行不超过当前版式规定的行数；超长文字以省略号结束，不越界，也不与主体互相遮挡。
 - [ ] 边框、点阵、网格、角标、卡片和线条是独立 SVG 元素，能在矢量编辑器中选中。
 - [ ] `--hero-image` 仅作为嵌入的 `<image>` data URI，原文件未被移动、改名、覆盖或压缩。
 - [ ] 如使用 `--hero-remove-light`，已放大检查浅色主体边缘；该模式会把浅底图反相成黑底线稿效果，不是真实 alpha 通道，也不能用于必须完整保留白色高光的正式素材。
@@ -35,7 +37,7 @@
 ## E. 导出与人工验收
 
 - [ ] 先保存 SVG，再尝试 Edge/Chrome headless PNG；PNG 失败时 SVG 仍可打开且错误原因已记录。
-- [ ] 人工在实际目标平台预览，检查目标比例、裁切、字体替换、透明度、对比度、压缩和安全边距；内置体系按 3:4 验收，公众号横图、抖音 9:16 等其他比例按专用版式验收。
+- [ ] 人工在实际目标平台预览，检查目标比例、裁切、字体替换、透明度、对比度、压缩和安全边距；`xhs-portrait`、`douyin-vertical`、`wechat-header`、`social-square` 和 `landscape-video` 分别按各自专用版式验收。
 - [ ] 通过后再用于封面或长图发布；素材或文案发生实质变化需重新检查。
 
 ## F. 多参考图覆盖
@@ -55,3 +57,12 @@
 - [ ] 正文配图沿用封面的主体材质与图形语言，没有临时切换到另一种摄影、插画或 3D 风格。
 - [ ] 八种页面放在同一总览中时能明显看出属于同一系列，同时不同页面仍各自适合其内容用途。
 - [ ] 已按 [series-consistency.md](series-consistency.md) 检查允许变化和禁止变化。
+
+## H. 多平台延伸
+
+- [ ] 同一个 `ref` 在五个 profile 中保留相同的 `tokens`、背景、色板、字体层级、纹理、线宽、圆角和主 motif；只改变构图、留白、主体大小和平台安全区。
+- [ ] `douyin-vertical` 的关键标题、人物脸部、日期和行动信息避开顶部 170 px 与底部 210 px 平台覆盖区。
+- [ ] `wechat-header`、`xhs-portrait` 和 `social-square` 已按公众号头图、正文、分享卡的职责组合检查，而不是把一张图跨平台硬裁。
+- [ ] 同一方向的五种画布已通过 [platform-canvas-profiles.md](platform-canvas-profiles.md) 的比例、输出结构、sidecar 和人工总览检查。
+- [ ] 使用 `build_platform_contact_sheet.py` 查看过“一个 ref 的五种画布”以及“一个 profile 的 21 个方向”；总览中没有因为只剩黑底或蓝底而丢失方向差异。
+- [ ] profile 之间的坐标变化没有被误判为换风格；若 tokens 或 motif 发生实质变化，已递增版本并重新人工审核。
