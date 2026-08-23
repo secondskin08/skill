@@ -793,8 +793,8 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="invert a near-white hero into black-backed ghosted line art; inspect before use",
     )
-    parser.add_argument("--width", type=int, default=DESIGN_W, help="output width in pixels")
-    parser.add_argument("--height", type=int, default=DESIGN_H, help="output height in pixels")
+    parser.add_argument("--width", type=int, default=DESIGN_W, help="output width in pixels; width/height must remain 3:4")
+    parser.add_argument("--height", type=int, default=DESIGN_H, help="output height in pixels; width/height must remain 3:4")
     parser.add_argument("--force", action="store_true", help="allow replacing existing SVG/PNG output")
     return parser
 
@@ -804,6 +804,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
     if args.width <= 0 or args.height <= 0:
         parser.error("--width 和 --height 必须为正整数")
+    if args.width * DESIGN_H != args.height * DESIGN_W:
+        parser.error(
+            "当前内置模板只支持 3:4 画布；--width/--height 只能改变像素大小且必须保持 3:4。"
+            "公众号横图、抖音 9:16 等比例请使用对应的专用版式。"
+        )
     if args.output.exists() and not args.force:
         parser.error(f"输出文件已存在，为保护旧稿未覆盖：{args.output}；如需替换请显式使用 --force")
     if args.png and args.png.exists() and not args.force:
