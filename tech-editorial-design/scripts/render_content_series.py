@@ -275,7 +275,7 @@ def _header(spec: PresetSpec, args: argparse.Namespace, page_label: str, *, titl
     return "".join(
         [
             _label(spec, 76, 108, f"{spec.ref_id} / {page_label.upper()}", primary, 18),
-            _text(spec, title_x, title_y, args.title, title_size, on_background, max_units=16, max_lines=2, weight=900, line_height=title_size * 1.1, anchor=anchor),
+            _text(spec, title_x, title_y, args.title, title_size, on_background, max_units=10.5, max_lines=2, weight=900, line_height=title_size * 1.1, anchor=anchor),
             _text(spec, title_x, title_y + 138, args.subtitle, 26, secondary, max_units=32, max_lines=2, weight=600, line_height=36, anchor=anchor),
         ]
     )

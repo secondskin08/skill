@@ -9,6 +9,22 @@
 - SVG 为可编辑源文件，也可以导出 PNG；
 - 同一系列会保存设计参数，避免正文和封面变成两套风格。
 
+## 画布比例与平台边界
+
+v05 提供 5 个有名字的专用画布。它们不是把 3:4 图片拉长、压扁或加黑边，而是使用同一 `ref-01` 至 `ref-21` 的设计令牌重新排版：背景、配色、字体层级、纹理、边框、圆角和 motif 保持不变，只根据画布改变构图与安全区。
+
+| profile | 尺寸 | 用途 | 页面范围 |
+|---|---:|---|---|
+| `xhs-portrait` | 1080×1440（3:4） | 小红书图文、公众号正文配图、竖版海报 | 8 页 |
+| `douyin-vertical` | 1080×1920（9:16） | 抖音竖屏封面、章节帧、数据帧和结尾帧 | 8 页 |
+| `wechat-header` | 900×383 | 公众号文章头图 | 仅 `cover` |
+| `social-square` | 1080×1080（1:1） | 公众号分享图、社交卡片、方形栏目封面 | 8 页 |
+| `landscape-video` | 1920×1080（16:9） | 横版视频、演示封面、电脑端宽屏内容 | 8 页 |
+
+公众号不是只用横图：推荐组合是 `wechat-header` 做文章头图、`xhs-portrait` 做正文和正文配图、`social-square` 做分享卡。抖音使用 `douyin-vertical`；需要横屏视频时使用 `landscape-video`。每个 profile 都有独立安全区，`series.json` 会记录尺寸、比例、安全区和固定 tokens。
+
+不要把一个 profile 的 PNG 直接裁成另一个平台的成品，也不要把 `--width` / `--height` 当作跨比例适配开关。3:4 的旧脚本仍可按 3:4 等比例输出；跨平台排版请使用 `scripts/render_platform_series.py`，完整规则见 [多平台画布说明](tech-editorial-design/references/platform-canvas-profiles.md)。
+
 ## 效果预览
 
 暗色硬件系列：
@@ -103,10 +119,32 @@ cp -R "$HOME/skill-library/tech-editorial-design" "$HOME/.codex/skills/"
 少文字，保持封面同款半透明材质和柔和配色。
 ```
 
+### 用命令生成多平台版本
+
+下面的命令可以直接复制。把 `ref-20`、标题和输出目录替换成自己的内容即可：
+
+```powershell
+cd "$HOME\.codex\skills\tech-editorial-design"
+python scripts\render_platform_series.py --preset ref-20 --profile xhs-portrait --all-pages --title "我的主题" --subtitle "同一套设计语言" --footer "我的栏目" --output-dir "$PWD\platform-v05" --png
+python scripts\render_platform_series.py --preset ref-20 --profile douyin-vertical --all-pages --title "我的主题" --subtitle "同一套设计语言" --footer "我的栏目" --output-dir "$PWD\platform-v05" --png
+python scripts\render_platform_series.py --preset ref-20 --profile wechat-header --page-type cover --title "我的主题" --subtitle "文章摘要" --footer "我的栏目" --output-dir "$PWD\platform-v05" --png
+python scripts\render_platform_series.py --preset ref-20 --profile social-square --page-type cover --title "我的主题" --subtitle "转发卡片" --footer "我的栏目" --output-dir "$PWD\platform-v05" --png
+python scripts\render_platform_series.py --preset ref-20 --profile landscape-video --all-pages --title "我的主题" --subtitle "同一套设计语言" --footer "我的栏目" --output-dir "$PWD\platform-v05" --png
+```
+
+如果要一次生成 21 个方向的同一页，用 `--all-presets`；如果要一次生成一个方向的 5 种画布，用 `--all-profiles`。第一次生成建议不要加 `--force`，这样不会覆盖旧稿。查看一个方向的五种封面总览：
+
+```powershell
+python scripts\build_platform_contact_sheet.py --input-root "$PWD\platform-v05" --preset ref-20 --page 01-cover.png --output "$PWD\platform-v05\ref-20-five-profiles.png"
+```
+
+这张总览只用于人工审核；最终保留每个 profile 文件夹中的 SVG、PNG 和 `series.json`。
+
 21 个预设的中文名、英文别名和适用场景见：
 
 - [预设目录](tech-editorial-design/references/preset-catalog.md)
 - [中文调用手册](tech-editorial-design/references/invocation-guide.md)
+- [多平台画布说明](tech-editorial-design/references/platform-canvas-profiles.md)
 - [封面到正文的一致性规则](tech-editorial-design/references/series-consistency.md)
 
 ## 本地脚本依赖
